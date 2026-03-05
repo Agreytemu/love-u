@@ -1,1 +1,135 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Totoo & Agrey | Mlango wa Mahaba</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            z-index: 10;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .special-font {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Floating Hearts Animation */
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+            animation: float 6s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 65, 108, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="heart-container"></div>
+
+    <div class="glass-card text-center">
+        <h1 class="special-font text-5xl text-white mb-2">Totoo & Agrey</h1>
+        <p class="text-white text-sm mb-8 tracking-widest uppercase">Mali ya Agrey Pekee</p>
+
+        <form id="loginForm" class="space-y-6 text-left">
+            <div>
+                <label class="block text-white text-xs font-semibold mb-2 ml-1">JINA LA PENZI (Username)</label>
+                <input type="text" id="username" placeholder="Ingiza jina lako au la mpenzi wako..." 
+                    class="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition">
+            </div>
+
+            <div>
+                <label class="block text-white text-xs font-semibold mb-2 ml-1">NYWILA YA MOYO (Password)</label>
+                <input type="password" id="password" placeholder="Siri ya moyo wangu..." 
+                    class="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50 transition">
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl text-white font-bold login-btn uppercase tracking-wider">
+                Fungua Moyo Wangu ❤️
+            </button>
+        </form>
+        
+        <p id="error-msg" class="text-red-600 mt-4 text-sm font-medium hidden italic"></p>
+    </div>
+
+    <script>
+        // Kutengeneza mioyo inayoelea
+        const container = document.getElementById('heart-container');
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 6000);
+        }
+        setInterval(createHeart, 300);
+
+        // Logic ya Sign In
+        const form = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('error-msg');
+
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.toLowerCase().trim();
+            const pass = document.getElementById('password').value.trim();
+
+            if ((user === "totoo" || user === "agrey") && pass === "muhibu") {
+                errorMsg.classList.remove('hidden');
+                errorMsg.classList.replace('text-red-600', 'text-green-500');
+                errorMsg.innerText = "Nakupenda sana... Tunakuingiza kwenye ulimwengu wetu!";
+                
+                setTimeout(() => {
+                    window.location.href = "love.html";
+                }, 2000);
+            } else {
+                errorMsg.classList.remove('hidden');
+                errorMsg.innerText = "Ooh! Inaonekana neno la siri au jina si sahihi. Jaribu tena, mpenzi.";
+            }
+        };
+    </script>
+</body>
+</html>
 
