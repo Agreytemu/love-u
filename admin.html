@@ -3,37 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrey Admin Panel | Control Center</title>
+    <title>Agrey Admin | Pro Media Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Poppins', sans-serif; }
-        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; }
+        body { background: #050505; color: white; font-family: 'Poppins', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
+        .upload-zone { border: 2px dashed rgba(255, 65, 108, 0.3); transition: 0.3s; }
+        .upload-zone:hover { border-color: #ff416c; background: rgba(255, 65, 108, 0.05); }
+        input::file-selector-button { background: #ff416c; border: none; padding: 10px 20px; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; margin-right: 15px; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6">
+<body class="min-h-screen p-4 md:p-10">
 
-    <div class="admin-card p-8 w-full max-w-md shadow-2xl">
-        <h2 class="text-2xl font-bold mb-2 text-pink-500">Agrey's Command Center</h2>
-        <p class="text-gray-400 text-sm mb-8">Pandisha mahaba mapya kwa ajili ya Totoo hapa.</p>
-
-        <div class="space-y-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
             <div>
-                <label class="block text-xs font-semibold text-gray-400 mb-2 uppercase">Chagua Faili (Picha/Video/Voice)</label>
-                <input type="file" id="fileInput" 
-                    class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-700 cursor-pointer">
+                <h1 class="text-3xl font-bold text-pink-500">Agrey Admin Panel</h1>
+                <p class="text-gray-500 text-sm italic">Manage Totoo's Digital Vault</p>
+            </div>
+            <a href="gallery.html" class="px-6 py-2 border border-white/20 rounded-full text-xs hover:bg-white hover:text-black transition">VIEW GALLERY</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <div class="glass-card p-8 sticky top-10">
+                    <h2 class="text-xl font-semibold mb-6">Upload New Media</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="upload-zone p-6 rounded-2xl text-center">
+                            <input type="file" id="fileInput" class="w-full text-xs text-gray-400">
+                            <p class="text-[10px] text-gray-500 mt-4 uppercase">Support: JPG, PNG, MP4, MP3, M4A</p>
+                        </div>
+
+                        <button onclick="uploadMedia()" id="uploadBtn" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold shadow-lg shadow-pink-500/20 transition-all">
+                            UPLOAD TO CLOUD
+                        </button>
+
+                        <div id="status" class="hidden text-center text-xs p-3 rounded-lg"></div>
+                    </div>
+                </div>
             </div>
 
-            <button onclick="uploadMedia()" id="uploadBtn" 
-                class="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-pink-500 hover:text-white transition-all disabled:opacity-50">
-                PANDISHA KWENYE VAULT
-            </button>
+            <div class="lg:col-span-2">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="Search file name..." 
+                            class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-sm">
+                        
+                        <select id="typeFilter" onchange="filterMedia()" class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-pink-500 text-sm">
+                            <option value="all">All Media</option>
+                            <option value="image">Images Only</option>
+                            <option value="video">Videos Only</option>
+                            <option value="audio">Voice Notes</option>
+                        </select>
+                    </div>
+                </div>
 
-            <div id="status" class="text-center text-sm mt-4 hidden"></div>
-            
-            <div class="pt-6 border-t border-white/10">
-                <a href="gallery.html" class="text-gray-500 text-xs hover:underline italic">← Rudi kwenye Gallery</a>
+                <div class="glass-card overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/5 text-gray-400 uppercase text-[10px] tracking-widest">
+                            <tr>
+                                <th class="p-4">Preview</th>
+                                <th class="p-4">Name</th>
+                                <th class="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-media-list">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -43,7 +83,97 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let allFiles = []; // Kweka data hapa kwa ajili ya filter
+
         async function uploadMedia() {
             const fileInput = document.getElementById('fileInput');
             const btn = document.getElementById('uploadBtn');
-            const
+            const status = document.getElementById('status');
+
+            if (!fileInput.files[0]) return alert("Chagua faili kwanza!");
+
+            const file = fileInput.files[0];
+            const fileName = `${Date.now()}_${file.name.replace(/\s/g, '_')}`;
+
+            btn.disabled = true;
+            btn.innerText = "Uploading...";
+            status.className = "block text-center text-xs p-3 rounded-lg bg-blue-500/20 text-blue-400";
+            status.innerText = "Sending to Supabase...";
+
+            const { data, error } = await supabase.storage.from('media').upload(fileName, file);
+
+            if (error) {
+                status.className = "block text-center text-xs p-3 rounded-lg bg-red-500/20 text-red-400";
+                status.innerText = "Error: " + error.message;
+            } else {
+                status.className = "block text-center text-xs p-3 rounded-lg bg-green-500/20 text-green-400";
+                status.innerText = "Success! File added to Vault.";
+                fileInput.value = '';
+                loadMediaList(); // Refresh list
+            }
+            btn.disabled = false;
+            btn.innerText = "UPLOAD TO CLOUD";
+        }
+
+        async function loadMediaList() {
+            const { data, error } = await supabase.storage.from('media').list('', { sortBy: { column: 'name', order: 'desc' } });
+            if (error) return;
+            allFiles = data;
+            renderTable(data);
+        }
+
+        function renderTable(files) {
+            const list = document.getElementById('admin-media-list');
+            list.innerHTML = '';
+
+            files.forEach(file => {
+                const ext = file.name.split('.').pop().toLowerCase();
+                const { data } = supabase.storage.from('media').getPublicUrl(file.name);
+                const url = data.publicUrl;
+
+                let preview = '';
+                if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) preview = `<img src="${url}" class="w-12 h-12 object-cover rounded-lg">`;
+                else if (['mp4', 'webm'].includes(ext)) preview = `<div class="w-12 h-12 bg-purple-500/20 flex items-center justify-center rounded-lg text-[10px]">VIDEO</div>`;
+                else preview = `<div class="w-12 h-12 bg-blue-500/20 flex items-center justify-center rounded-lg text-[10px]">AUDIO</div>`;
+
+                list.innerHTML += `
+                    <tr class="border-t border-white/5 hover:bg-white/5 transition">
+                        <td class="p-4">${preview}</td>
+                        <td class="p-4"><span class="text-xs text-gray-400">${file.name.substring(0, 20)}...</span></td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteFile('${file.name}')" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterMedia() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterType = document.getElementById('typeFilter').value;
+
+            const filtered = allFiles.filter(file => {
+                const nameMatch = file.name.toLowerCase().includes(searchTerm);
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                let typeMatch = true;
+                if (filterType === 'image') typeMatch = ['jpg', 'jpeg', 'png', 'gif'].includes(ext);
+                if (filterType === 'video') typeMatch = ['mp4', 'webm', 'mov'].includes(ext);
+                if (filterType === 'audio') typeMatch = ['mp3', 'wav', 'm4a'].includes(ext);
+
+                return nameMatch && typeMatch;
+            });
+            renderTable(filtered);
+        }
+
+        async function deleteFile(name) {
+            if (!confirm("Kaka, una uhakika unataka kufuta picha hii milele?")) return;
+            const { error } = await supabase.storage.from('media').remove([name]);
+            if (error) alert("Futa imefeli!");
+            else loadMediaList();
+        }
+
+        loadMediaList();
+    </script>
+</body>
+</html>
