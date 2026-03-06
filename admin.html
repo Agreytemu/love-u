@@ -3,47 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrey Admin Pro | Control Panel</title>
+    <title>Agrey Admin | Pro Media Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { background: #050505; color: white; font-family: 'Poppins', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="min-h-screen p-4 md:p-10">
+
     <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
-            <h1 class="text-2xl font-bold text-pink-500 tracking-tighter">AGREY COMMAND CENTER</h1>
-            <a href="gallery.html" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition">RUDI GALLERY</a>
-        </header>
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-3xl font-bold text-pink-500">Agrey Admin</h1>
+            <a href="gallery.html" class="px-6 py-2 border border-white/20 rounded-full text-xs hover:bg-white hover:text-black transition">RUDI GALLERY</a>
+        </div>
 
-        <div class="glass-card p-8 mb-10">
-            <h2 class="text-lg font-semibold mb-4">Pandisha Picha, Video au Sauti</h2>
-            <div class="flex flex-col gap-4">
-                <input type="file" id="fileInput" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-700 cursor-pointer bg-white/5 p-4 rounded-xl">
-                <button onclick="handleUpload()" id="uploadBtn" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold shadow-lg shadow-pink-500/30 transition-all">PANDISHA KWENYE VAULT</button>
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-semibold mb-6">Pakia Picha, Video au Voice Note</h2>
+            
+            <div class="space-y-6">
+                <input type="file" id="fileInput" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm">
+
+                <button onclick="handleUpload()" id="uploadBtn" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold shadow-lg transition-all">
+                    PANDISHA KWENYE VAULT
+                </button>
+
+                <div id="statusMessage" class="hidden text-center text-sm p-4 rounded-xl"></div>
             </div>
-            <div id="status" class="mt-4 text-center text-sm font-medium hidden"></div>
         </div>
 
-        <div class="flex gap-4 mb-6">
-            <input type="text" id="searchBox" onkeyup="loadMedia()" placeholder="Tafuta jina..." class="bg-white/5 border border-white/10 px-4 py-2 rounded-lg flex-1 outline-none focus:border-pink-500">
-            <select id="typeFilter" onchange="loadMedia()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-lg outline-none">
-                <option value="all">Vyote</option>
-                <option value="image">Picha</option>
-                <option value="video">Video</option>
-                <option value="audio">Voice</option>
-            </select>
-        </div>
-
-        <div class="glass-card overflow-hidden">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-white/5 text-gray-400">
-                    <tr><th class="p-4">Faili</th><th class="p-4 text-right">Action</th></tr>
-                </thead>
-                <tbody id="mediaList"></tbody>
-            </table>
+        <div class="mt-10 glass-card p-6">
+            <input type="text" id="adminSearch" onkeyup="renderAdminList()" placeholder="Tafuta faili hapa..." class="w-full bg-white/5 border border-white/10 p-3 rounded-lg mb-6 outline-none focus:border-pink-500">
+            <div id="adminMediaList" class="space-y-4">
+                </div>
         </div>
     </div>
 
@@ -52,90 +46,105 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let allFiles = [];
+
         async function handleUpload() {
             const fileInput = document.getElementById('fileInput');
-            const status = document.getElementById('status');
+            const status = document.getElementById('statusMessage');
             const btn = document.getElementById('uploadBtn');
 
-            if (!fileInput.files[0]) return alert("Chagua faili kwanza!");
+            if (!fileInput.files[0]) {
+                alert("Kaka, chagua file kwanza!");
+                return;
+            }
 
             const file = fileInput.files[0];
             const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
             const fileType = file.type.split('/')[0]; // image, video, au audio
 
+            // Anza Loading
             btn.disabled = true;
-            btn.innerText = "Inatuma...";
-            status.className = "mt-4 text-center text-sm text-yellow-500 block";
-            status.innerText = "Inapakia kwenye Cloud...";
+            btn.innerText = "Inatuma... Tulia kidogo";
+            status.className = "text-yellow-500 bg-yellow-500/10 p-4 rounded-xl block";
+            status.innerText = "Inapakia faili kwenye Storage...";
 
-            // 1. UPLOAD KWENYE STORAGE
-            const { data: sData, error: sError } = await supabase.storage.from('media').upload(fileName, file);
-            if (sError) {
+            try {
+                // 1. Pandisha kwenye Storage
+                const { data: sData, error: sError } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, file);
+
+                if (sError) throw sError;
+
+                // 2. Pata Public URL
+                const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
+                const publicUrl = urlData.publicUrl;
+
+                status.innerText = "Inahifadhi maelezo kwenye Gallery...";
+
+                // 3. Weka maelezo kwenye Database Table (Hii ndio Gallery inasoma)
+                const { error: dbError } = await supabase
+                    .from('vault_media')
+                    .insert([{
+                        file_name: fileName,
+                        file_url: publicUrl,
+                        file_type: fileType
+                    }]);
+
+                if (dbError) throw dbError;
+
+                // Success!
+                status.className = "text-green-500 bg-green-500/10 p-4 rounded-xl block";
+                status.innerText = "SAFI! Faili limepanda na linaonekana Gallery sasa hivi.";
+                fileInput.value = ''; // Safisha input
+                fetchAdminMedia(); // Refresh list ya chini
+
+            } catch (err) {
+                console.error(err);
+                status.className = "text-red-500 bg-red-500/10 p-4 rounded-xl block";
+                status.innerText = "Imefeli: " + err.message;
+            } finally {
                 btn.disabled = false;
-                status.innerText = "Error Storage: " + sError.message;
-                return;
+                btn.innerText = "PANDISHA KWENYE VAULT";
             }
-
-            // 2. PATA URL
-            const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
-            const publicUrl = urlData.publicUrl;
-
-            // 3. INSERT KWENYE TABLE (Gallery inasoma hapa)
-            const { error: dbError } = await supabase.from('vault_media').insert([{
-                file_name: fileName,
-                file_url: publicUrl,
-                file_type: fileType
-            }]);
-
-            if (dbError) {
-                status.innerText = "Error Database: " + dbError.message;
-            } else {
-                status.className = "mt-4 text-center text-sm text-green-500 block";
-                status.innerText = "SUCCESS! Vitu vimepanda na Gallery imesasishwa.";
-                fileInput.value = '';
-                loadMedia();
-            }
-            btn.disabled = false;
-            btn.innerText = "PANDISHA KWENYE VAULT";
         }
 
-        async function loadMedia() {
-            const search = document.getElementById('searchBox').value.toLowerCase();
-            const type = document.getElementById('typeFilter').value;
-            const list = document.getElementById('mediaList');
+        async function fetchAdminMedia() {
+            const { data, error } = await supabase.from('vault_media').select('*').order('created_at', { ascending: false });
+            if (!error) {
+                allFiles = data;
+                renderAdminList();
+            }
+        }
 
-            let query = supabase.from('vault_media').select('*').order('created_at', { ascending: false });
-            if (type !== 'all') query = query.eq('file_type', type);
-
-            const { data, error } = await query;
-            if (error) return;
-
+        function renderAdminList() {
+            const list = document.getElementById('adminMediaList');
+            const search = document.getElementById('adminSearch').value.toLowerCase();
             list.innerHTML = '';
-            data.filter(f => f.file_name.toLowerCase().includes(search)).forEach(item => {
+
+            const filtered = allFiles.filter(f => f.file_name.toLowerCase().includes(search));
+
+            filtered.forEach(item => {
                 list.innerHTML += `
-                    <tr class="border-t border-white/5">
-                        <td class="p-4 flex items-center gap-3">
-                            <div class="w-10 h-10 bg-white/10 rounded overflow-hidden">
-                                ${item.file_type === 'image' ? `<img src="${item.file_url}" class="w-full h-full object-cover">` : `<div class="flex items-center justify-center h-full text-[10px]">${item.file_type.toUpperCase()}</div>`}
-                            </div>
-                            <span class="text-xs text-gray-400">${item.file_name.substring(0,15)}...</span>
-                        </td>
-                        <td class="p-4 text-right">
-                            <button onclick="deleteMedia('${item.id}', '${item.file_name}')" class="text-red-500 font-bold text-xs">FUTA</button>
-                        </td>
-                    </tr>
+                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs text-gray-500">${item.file_type.toUpperCase()}</span>
+                            <span class="text-sm truncate w-32 md:w-64">${item.file_name}</span>
+                        </div>
+                        <button onclick="deleteFile('${item.id}', '${item.file_name}')" class="text-red-500 text-xs font-bold">FUTA</button>
+                    </div>
                 `;
             });
         }
 
-        async function deleteMedia(id, fileName) {
-            if(!confirm("Futa kabisa?")) return;
+        async function deleteFile(id, fileName) {
+            if (!confirm("Unataka kufuta kabisa?")) return;
             await supabase.storage.from('media').remove([fileName]);
             await supabase.from('vault_media').delete().eq('id', id);
-            loadMedia();
+            fetchAdminMedia();
         }
 
-        loadMedia();
+        fetchAdminMedia();
     </script>
 </body>
 </html>
