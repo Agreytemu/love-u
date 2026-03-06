@@ -34,11 +34,22 @@
         }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* Navigation Style */
         .admin-nav {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Search Bar Style */
+        .search-input {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+        }
+        .search-input:focus {
+            border-color: #ff416c;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(255, 65, 108, 0.2);
         }
     </style>
 </head>
@@ -46,15 +57,19 @@
 
     <nav class="fixed top-0 left-0 w-full z-50 admin-nav px-6 py-3 flex justify-between items-center">
         <a href="love.html" class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-tighter">← Home</a>
-        <a href="admin.html" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-lg shadow-pink-500/20">
+        <a href="admin.html" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-full text-[10px] font-bold transition-all shadow-lg shadow-pink-500/20">
             ADMIN PANEL
         </a>
     </nav>
 
-    <header class="text-center mb-16 pt-20">
+    <header class="text-center mb-10 pt-20">
         <h1 class="special-font text-6xl text-pink-500 mb-2">Maktaba ya Siri</h1>
-        <p class="text-gray-400 uppercase tracking-widest text-[10px] md:text-xs">Kila kitu unachokipenda, kiko hapa - Kwa ajili ya Totoo</p>
-        <div class="h-1 w-20 bg-pink-600 mx-auto mt-4 rounded-full"></div>
+        <p class="text-gray-400 uppercase tracking-widest text-[10px]">Kila kitu unachokipenda kiko hapa</p>
+        
+        <div class="max-w-md mx-auto mt-8 px-4">
+            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="Tafuta picha, video au sauti..." 
+                class="search-input w-full py-3 px-6 rounded-full text-sm outline-none text-center">
+        </div>
     </header>
 
     <div id="gallery-loader" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -74,33 +89,47 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let localMediaData = []; // Tunatunza data hapa ili kusearch bila ku-refresh
+
         async function fetchMedia() {
-            const { data, error } = await supabase.storage.from('media').list('', {
-                limit: 100,
-                offset: 0,
-                sortBy: { column: 'created_at', order: 'desc' }, // Mpya zaidi ianze
-            });
+            // TUNASOMA KWENYE TABLE SASA (VAULT_MEDIA)
+            const { data, error } = await supabase
+                .from('vault_media')
+                .select('*')
+                .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error fetching media:', error);
+                console.error('Error fetching data:', error);
                 return;
             }
 
+            localMediaData = data; // Hifadhi data kwa ajili ya search
+            displayMedia(localMediaData);
+        }
+
+        function displayMedia(mediaList) {
             const grid = document.getElementById('media-grid');
             const loader = document.getElementById('gallery-loader');
+            
+            grid.innerHTML = ''; // Safisha grid
 
-            data.forEach(file => {
-                const { data: publicUrlData } = supabase.storage.from('media').getPublicUrl(file.name);
-                const url = publicUrlData.publicUrl;
-                const ext = file.name.split('.').pop().toLowerCase();
+            if (mediaList.length === 0) {
+                grid.innerHTML = '<p class="text-center text-gray-500 col-span-full py-10">Hakuna kilichopatikana...</p>';
+            }
+
+            mediaList.forEach(item => {
+                const url = item.file_url;
+                const type = item.file_type;
+                const name = item.file_name;
+                const ext = name.split('.').pop().toLowerCase();
                 
                 let htmlContent = '';
 
-                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                if (type === 'image') {
                     htmlContent = `<img src="${url}" class="w-full h-auto block" loading="lazy">`;
-                } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
+                } else if (type === 'video') {
                     htmlContent = `<video controls class="w-full h-auto"><source src="${url}" type="video/${ext}"></video>`;
-                } else if (['mp3', 'wav', 'm4a', 'ogg'].includes(ext)) {
+                } else if (type === 'audio') {
                     htmlContent = `
                         <div class="p-6 text-center">
                             <p class="text-[10px] mb-3 text-pink-400 font-bold uppercase tracking-widest">Voice Note 🎙️</p>
@@ -118,6 +147,18 @@
 
             loader.classList.add('hidden');
             grid.classList.remove('hidden');
+        }
+
+        // SEARCH FILTER LOGIC
+        function filterMedia() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Hii inatafuta kama jina la file lina herufi ulizoandika
+            const filtered = localMediaData.filter(item => {
+                return item.file_name.toLowerCase().includes(query);
+            });
+
+            displayMedia(filtered);
         }
 
         fetchMedia();
