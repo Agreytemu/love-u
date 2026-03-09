@@ -11,85 +11,113 @@
         body { background: #000; color: #fff; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
         .special-font { font-family: 'Dancing Script', cursive; }
         
-        .media-container { column-count: 1; column-gap: 15px; }
-        @media (min-width: 768px) { .media-container { column-count: 3; } }
+        /* GRID YA KISTAAILI - PICHA 2 KWENYE SIMU */
+        .media-container { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            padding: 5px;
+        }
+        
+        @media (min-width: 768px) { 
+            .media-container { grid-template-columns: repeat(4, 1fr); gap: 15px; } 
+        }
 
         .media-item {
-            break-inside: avoid;
-            margin-bottom: 15px;
             border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.02);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 65, 108, 0.2);
+            background: rgba(15, 15, 15, 0.6);
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(255, 65, 108, 0.1);
         }
-        .media-item:hover { transform: scale(1.03); border-color: #ff416c; box-shadow: 0 10px 30px rgba(255, 65, 108, 0.3); }
 
+        /* PICHA NDOGO NA ZA KISTAAILI */
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 130px; /* Saizi ndogo kistaili zaidi */
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255, 65, 108, 0.1);
+        }
+
+        /* CAPTION YA KIMAPENZI ZAIDI */
         .caption-box {
-            padding: 12px;
-            background: rgba(255, 65, 108, 0.05);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
-            color: #ccc;
-            line-height: 1.4;
+            padding: 10px 6px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 65, 108, 0.1));
+            font-family: 'Dancing Script', cursive; /* Font ya mahaba */
+            font-size: 15px; 
+            color: #ff85a1;
+            text-align: center;
+            line-height: 1.2;
         }
 
-        audio { filter: invert(100%) hue-rotate(180deg) brightness(1.5); width: 100%; height: 35px; }
-        
-        .loading-shimmer {
-            background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        .admin-nav {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .media-item:hover {
+            transform: translateY(-5px);
+            border-color: #ff416c;
+            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.3);
         }
 
+        /* SEARCH BAR YA KIMAPENZI */
         .search-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 65, 108, 0.05);
+            border: 1px solid rgba(255, 65, 108, 0.2);
+            color: white;
             transition: 0.3s;
         }
         .search-input:focus {
             border-color: #ff416c;
-            background: rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 15px rgba(255, 65, 108, 0.2);
+        }
+
+        /* VOICE NOTE STYLE */
+        .voice-card {
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 65, 108, 0.05);
+        }
+        audio { filter: invert(100%) hue-rotate(150deg) brightness(1.2); width: 90%; scale: 0.85; }
+
+        .admin-nav {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 65, 108, 0.3);
         }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-3 md:p-10">
 
     <nav class="fixed top-0 left-0 w-full z-50 admin-nav px-6 py-3 flex justify-between items-center">
-        <a href="love.html" class="text-xs font-bold text-gray-400 hover:text-white uppercase tracking-tighter">← Home</a>
-        <a href="admin.html" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-full text-[10px] font-bold transition-all shadow-lg shadow-pink-500/20">
-            ADMIN PANEL
+        <a href="love.html" class="special-font text-xl text-pink-400 hover:text-white">❤️ My Love</a>
+        <a href="admin.html" class="bg-pink-600/20 border border-pink-500/50 text-pink-500 px-4 py-1 rounded-full text-[10px] font-bold tracking-tighter">
+            ADMIN
         </a>
     </nav>
 
-    <header class="text-center mb-10 pt-20">
-        <h1 class="special-font text-6xl text-pink-500 mb-2">Maktaba ya Siri</h1>
-        <p class="text-gray-400 uppercase tracking-widest text-[10px]">Kila kitu unachokipenda kiko hapa</p>
+    <header class="text-center mb-8 pt-24">
+        <h1 class="special-font text-6xl text-pink-500 mb-2 drop-shadow-lg">Maktaba ya Siri</h1>
+        <p class="text-pink-300/60 uppercase tracking-[0.3em] text-[7px] font-bold">Kila Picha ina Tabasamu Lako ❤️</p>
         
-        <div class="max-w-md mx-auto mt-8 px-4">
-            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="Tafuta picha, video au sauti..." 
-                class="search-input w-full py-3 px-6 rounded-full text-sm outline-none text-center">
+        <div class="max-w-xs mx-auto mt-8">
+            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="Tafuta mahaba hapa..." 
+                class="search-input w-full py-2 px-6 rounded-full text-xs outline-none text-center">
         </div>
     </header>
 
-    <div id="gallery-loader" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="h-64 loading-shimmer rounded-3xl"></div>
-        <div class="h-64 loading-shimmer rounded-3xl"></div>
-        <div class="h-64 loading-shimmer rounded-3xl"></div>
+    <div id="gallery-loader" class="text-center py-20">
+        <p class="special-font text-3xl text-pink-500 animate-pulse">Inafungua moyo...</p>
     </div>
 
     <div id="media-grid" class="media-container hidden"></div>
 
-    <footer class="mt-20 text-center text-gray-600 text-[10px] uppercase tracking-[0.3em]">
-        Mali ya Agrey & Totoo | © 2024 - 2026
+    <footer class="mt-20 text-center pb-10">
+        <p class="text-pink-500 text-xl mb-2">❤️</p>
+        <p class="text-gray-700 text-[8px] uppercase tracking-[0.4em]">Mali ya Agrey & Totoo | 2026</p>
     </footer>
 
     <script>
@@ -108,7 +136,7 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error:', error);
                 return;
             }
 
@@ -123,36 +151,33 @@
             grid.innerHTML = ''; 
 
             if (mediaList.length === 0) {
-                grid.innerHTML = '<p class="text-center text-gray-500 col-span-full py-10">Hakuna kilichopatikana...</p>';
+                grid.innerHTML = '<p class="text-center text-pink-900 col-span-full py-10 special-font text-xl">Bado sijaweka kumbukumbu hapa...</p>';
             }
 
             mediaList.forEach(item => {
                 const url = item.file_url;
                 const type = item.file_type;
-                const name = item.file_name;
-                const caption = item.caption || ""; // Inasoma caption kutoka DB
-                const ext = name.split('.').pop().toLowerCase();
+                const caption = item.caption || "";
                 
                 let htmlContent = '';
 
                 if (type === 'image') {
-                    htmlContent = `<img src="${url}" class="w-full h-auto block" loading="lazy">`;
+                    htmlContent = `<img src="${url}" loading="lazy" onclick="window.open('${url}', '_blank')">`;
                 } else if (type === 'video') {
-                    htmlContent = `<video controls class="w-full h-auto"><source src="${url}" type="video/${ext}"></video>`;
+                    htmlContent = `<video controls><source src="${url}"></video>`;
                 } else if (type === 'audio') {
                     htmlContent = `
-                        <div class="p-6 text-center">
-                            <p class="text-[10px] mb-3 text-pink-400 font-bold uppercase tracking-widest">Voice Note 🎙️</p>
-                            <audio controls class="rounded-lg"><source src="${url}" type="audio/${ext}"></audio>
+                        <div class="voice-card">
+                            <span class="text-[14px] mb-2">🎙️</span>
+                            <audio controls><source src="${url}"></audio>
                         </div>`;
                 }
 
-                // Kama kuna caption, ionyeshe chini ya picha/video
                 let captionHtml = caption ? `<div class="caption-box">${caption}</div>` : '';
 
                 if (htmlContent) {
                     const div = document.createElement('div');
-                    div.className = 'media-item shadow-2xl flex flex-col';
+                    div.className = 'media-item';
                     div.innerHTML = htmlContent + captionHtml;
                     grid.appendChild(div);
                 }
@@ -164,13 +189,10 @@
 
         function filterMedia() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            
             const filtered = localMediaData.filter(item => {
-                const nameMatch = item.file_name.toLowerCase().includes(query);
-                const captionMatch = (item.caption || "").toLowerCase().includes(query);
-                return nameMatch || captionMatch;
+                return (item.file_name || "").toLowerCase().includes(query) || 
+                       (item.caption || "").toLowerCase().includes(query);
             });
-
             displayMedia(filtered);
         }
 
