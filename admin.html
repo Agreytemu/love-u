@@ -26,6 +26,8 @@
             <div class="space-y-6">
                 <input type="file" id="fileInput" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm">
 
+                <textarea id="captionInput" placeholder="Andika caption hapa (Sio lazima)..." class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm outline-none focus:border-pink-500 h-24 resize-none"></textarea>
+
                 <button onclick="handleUpload()" id="uploadBtn" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold shadow-lg transition-all">
                     PANDISHA KWENYE VAULT
                 </button>
@@ -54,6 +56,7 @@
 
         async function handleUpload() {
             const fileInput = document.getElementById('fileInput');
+            const captionInput = document.getElementById('captionInput'); // Kuchukua caption input
             const status = document.getElementById('statusMessage');
             const btn = document.getElementById('uploadBtn');
 
@@ -63,6 +66,7 @@
             }
 
             const file = fileInput.files[0];
+            const caption = captionInput.value; // Thamani ya caption
             const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
             const fileType = file.type.split('/')[0];
 
@@ -85,20 +89,24 @@
 
                 status.innerText = "Inahifadhi maelezo kwenye Gallery...";
 
-                // 3. Kuingiza data kwenye table ya 'vault_media'
+                // 3. Kuingiza data kwenye table ya 'vault_media' (Pamoja na caption)
                 const { error: dbError } = await _supabase
                     .from('vault_media')
                     .insert([{
                         file_name: fileName,
                         file_url: publicUrl,
-                        file_type: fileType
+                        file_type: fileType,
+                        caption: caption // Hapa caption inaingia kwenye DB
                     }]);
 
                 if (dbError) throw dbError;
 
                 status.className = "text-green-500 bg-green-500/10 p-4 rounded-xl block";
                 status.innerText = "SAFI! Faili limepanda na linaonekana Gallery sasa hivi.";
+                
+                // Safisha fomu
                 fileInput.value = ''; 
+                captionInput.value = '';
                 fetchAdminMedia(); 
 
             } catch (err) {
@@ -131,7 +139,10 @@
                     <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
                         <div class="flex items-center gap-4">
                             <span class="text-xs text-gray-500">${item.file_type.toUpperCase()}</span>
-                            <span class="text-sm truncate w-32 md:w-64">${item.file_name}</span>
+                            <div class="flex flex-col">
+                                <span class="text-sm truncate w-32 md:w-64 font-semibold">${item.file_name}</span>
+                                <span class="text-[10px] text-gray-400 italic">${item.caption || 'No caption'}</span>
+                            </div>
                         </div>
                         <button onclick="deleteFile('${item.id}', '${item.file_name}')" class="text-red-500 text-xs font-bold">FUTA</button>
                     </div>
