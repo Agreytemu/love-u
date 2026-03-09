@@ -42,9 +42,13 @@
     </div>
 
     <script>
+        // Credentials zako zilizowekwa moja kwa moja
         const SUPABASE_URL = 'https://rcfocaatkscgassogibs.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Kutengeneza connection
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allFiles = [];
 
@@ -60,30 +64,29 @@
 
             const file = fileInput.files[0];
             const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-            const fileType = file.type.split('/')[0]; // image, video, au audio
+            const fileType = file.type.split('/')[0];
 
-            // Anza Loading
             btn.disabled = true;
             btn.innerText = "Inatuma... Tulia kidogo";
             status.className = "text-yellow-500 bg-yellow-500/10 p-4 rounded-xl block";
             status.innerText = "Inapakia faili kwenye Storage...";
 
             try {
-                // 1. Pandisha kwenye Storage
-                const { data: sData, error: sError } = await supabase.storage
+                // 1. Upload kwenye Storage bucket inayoitwa 'media'
+                const { data: sData, error: sError } = await _supabase.storage
                     .from('media')
                     .upload(fileName, file);
 
                 if (sError) throw sError;
 
-                // 2. Pata Public URL
-                const { data: urlData } = supabase.storage.from('media').getPublicUrl(fileName);
+                // 2. Kuchukua Public URL
+                const { data: urlData } = _supabase.storage.from('media').getPublicUrl(fileName);
                 const publicUrl = urlData.publicUrl;
 
                 status.innerText = "Inahifadhi maelezo kwenye Gallery...";
 
-                // 3. Weka maelezo kwenye Database Table (Hii ndio Gallery inasoma)
-                const { error: dbError } = await supabase
+                // 3. Kuingiza data kwenye table ya 'vault_media'
+                const { error: dbError } = await _supabase
                     .from('vault_media')
                     .insert([{
                         file_name: fileName,
@@ -93,11 +96,10 @@
 
                 if (dbError) throw dbError;
 
-                // Success!
                 status.className = "text-green-500 bg-green-500/10 p-4 rounded-xl block";
                 status.innerText = "SAFI! Faili limepanda na linaonekana Gallery sasa hivi.";
-                fileInput.value = ''; // Safisha input
-                fetchAdminMedia(); // Refresh list ya chini
+                fileInput.value = ''; 
+                fetchAdminMedia(); 
 
             } catch (err) {
                 console.error(err);
@@ -110,7 +112,7 @@
         }
 
         async function fetchAdminMedia() {
-            const { data, error } = await supabase.from('vault_media').select('*').order('created_at', { ascending: false });
+            const { data, error } = await _supabase.from('vault_media').select('*').order('created_at', { ascending: false });
             if (!error) {
                 allFiles = data;
                 renderAdminList();
@@ -139,11 +141,16 @@
 
         async function deleteFile(id, fileName) {
             if (!confirm("Unataka kufuta kabisa?")) return;
-            await supabase.storage.from('media').remove([fileName]);
-            await supabase.from('vault_media').delete().eq('id', id);
-            fetchAdminMedia();
+            try {
+                await _supabase.storage.from('media').remove([fileName]);
+                await _supabase.from('vault_media').delete().eq('id', id);
+                fetchAdminMedia();
+            } catch (err) {
+                alert("Imefeli kufuta: " + err.message);
+            }
         }
 
+        // Pakia list mara tu page inapofunguka
         fetchAdminMedia();
     </script>
 </body>
