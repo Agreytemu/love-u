@@ -2,167 +2,64 @@
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agrey Admin | Pro Media Manager</title>
+    <title>Admin | Cloud Upload</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body { background: #050505; color: white; font-family: 'Poppins', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
-    </style>
 </head>
-<body class="min-h-screen p-4 md:p-10">
-
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-10">
-            <h1 class="text-3xl font-bold text-pink-500">Agrey Admin</h1>
-            <a href="gallery.html" class="px-6 py-2 border border-white/20 rounded-full text-xs hover:bg-white hover:text-black transition">RUDI GALLERY</a>
-        </div>
-
-        <div class="glass-card p-8">
-            <h2 class="text-xl font-semibold mb-6">Pakia Picha, Video au Voice Note</h2>
-            
-            <div class="space-y-6">
-                <input type="file" id="fileInput" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm">
-
-                <textarea id="captionInput" placeholder="Andika caption hapa (Sio lazima)..." class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-sm outline-none focus:border-pink-500 h-24 resize-none"></textarea>
-
-                <button onclick="handleUpload()" id="uploadBtn" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-bold shadow-lg transition-all">
-                    PANDISHA KWENYE VAULT
-                </button>
-
-                <div id="statusMessage" class="hidden text-center text-sm p-4 rounded-xl"></div>
-            </div>
-        </div>
-
-        <div class="mt-10 glass-card p-6">
-            <input type="text" id="adminSearch" onkeyup="renderAdminList()" placeholder="Tafuta faili hapa..." class="w-full bg-white/5 border border-white/10 p-3 rounded-lg mb-6 outline-none focus:border-pink-500">
-            <div id="adminMediaList" class="space-y-4">
-                </div>
-        </div>
+<body class="bg-black text-white p-10">
+    <div class="max-w-md mx-auto bg-zinc-900 p-8 rounded-3xl border border-white/10">
+        <h2 class="text-2xl font-bold mb-6 text-pink-500">Pandisha Kumbukumbu</h2>
+        
+        <input type="file" id="fileInput" class="mb-4 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-pink-600 file:text-white hover:file:bg-pink-700">
+        
+        <input type="text" id="captionInput" placeholder="Andika maelezo ya picha (Description)..." class="w-full p-3 rounded-xl bg-black border border-white/20 mb-6 text-sm outline-none focus:border-pink-500">
+        
+        <button onclick="uploadNow()" id="uploadBtn" class="w-full bg-pink-600 py-3 rounded-xl font-bold hover:bg-pink-700 transition">Rusha Hewani 🚀</button>
+        
+        <p id="status" class="mt-4 text-center text-xs text-gray-500"></p>
     </div>
 
     <script>
-        // Credentials zako zilizowekwa moja kwa moja
-        const SUPABASE_URL = 'https://rcfocaatkscgassogibs.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
-        
-        // Kutengeneza connection
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        // WEKA DATA ZAKO HAPA KAKA
+        const CLOUD_NAME = 'DHALI_YAKO_HAPA'; // Jina lako la Cloudinary
+        const UPLOAD_PRESET = 'PRESET_YAKO_HAPA'; // Ile preset ya 'Unsigned'
 
-        let allFiles = [];
-
-        async function handleUpload() {
-            const fileInput = document.getElementById('fileInput');
-            const captionInput = document.getElementById('captionInput'); // Kuchukua caption input
-            const status = document.getElementById('statusMessage');
+        async function uploadNow() {
+            const file = document.getElementById('fileInput').files[0];
+            const caption = document.getElementById('captionInput').value;
             const btn = document.getElementById('uploadBtn');
+            const status = document.getElementById('status');
 
-            if (!fileInput.files[0]) {
-                alert("Kaka, chagua file kwanza!");
-                return;
-            }
+            if (!file) return alert("Chagua picha kwanza!");
 
-            const file = fileInput.files[0];
-            const caption = captionInput.value; // Thamani ya caption
-            const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-            const fileType = file.type.split('/')[0];
-
+            btn.innerText = "Inatuma...";
             btn.disabled = true;
-            btn.innerText = "Inatuma... Tulia kidogo";
-            status.className = "text-yellow-500 bg-yellow-500/10 p-4 rounded-xl block";
-            status.innerText = "Inapakia faili kwenye Storage...";
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', UPLOAD_PRESET);
+            formData.append('tags', 'vault'); // Tag muhimu ili Gallery izione
+            formData.append('context', `caption=${caption}`); // Hapa ndipo maelezo yanakaa
 
             try {
-                // 1. Upload kwenye Storage bucket inayoitwa 'media'
-                const { data: sData, error: sError } = await _supabase.storage
-                    .from('media')
-                    .upload(fileName, file);
-
-                if (sError) throw sError;
-
-                // 2. Kuchukua Public URL
-                const { data: urlData } = _supabase.storage.from('media').getPublicUrl(fileName);
-                const publicUrl = urlData.publicUrl;
-
-                status.innerText = "Inahifadhi maelezo kwenye Gallery...";
-
-                // 3. Kuingiza data kwenye table ya 'vault_media' (Pamoja na caption)
-                const { error: dbError } = await _supabase
-                    .from('vault_media')
-                    .insert([{
-                        file_name: fileName,
-                        file_url: publicUrl,
-                        file_type: fileType,
-                        caption: caption // Hapa caption inaingia kwenye DB
-                    }]);
-
-                if (dbError) throw dbError;
-
-                status.className = "text-green-500 bg-green-500/10 p-4 rounded-xl block";
-                status.innerText = "SAFI! Faili limepanda na linaonekana Gallery sasa hivi.";
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
                 
-                // Safisha fomu
-                fileInput.value = ''; 
-                captionInput.value = '';
-                fetchAdminMedia(); 
-
+                const data = await res.json();
+                if (data.secure_url) {
+                    status.innerText = "SAFI! Imepanda.";
+                    setTimeout(() => window.location.href = 'gallery.html', 1500);
+                } else {
+                    status.innerText = "Imefeli: " + data.error.message;
+                }
             } catch (err) {
-                console.error(err);
-                status.className = "text-red-500 bg-red-500/10 p-4 rounded-xl block";
-                status.innerText = "Imefeli: " + err.message;
+                status.innerText = "Kuna tatizo la internet!";
             } finally {
+                btn.innerText = "Rusha Hewani 🚀";
                 btn.disabled = false;
-                btn.innerText = "PANDISHA KWENYE VAULT";
             }
         }
-
-        async function fetchAdminMedia() {
-            const { data, error } = await _supabase.from('vault_media').select('*').order('created_at', { ascending: false });
-            if (!error) {
-                allFiles = data;
-                renderAdminList();
-            }
-        }
-
-        function renderAdminList() {
-            const list = document.getElementById('adminMediaList');
-            const search = document.getElementById('adminSearch').value.toLowerCase();
-            list.innerHTML = '';
-
-            const filtered = allFiles.filter(f => f.file_name.toLowerCase().includes(search));
-
-            filtered.forEach(item => {
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
-                        <div class="flex items-center gap-4">
-                            <span class="text-xs text-gray-500">${item.file_type.toUpperCase()}</span>
-                            <div class="flex flex-col">
-                                <span class="text-sm truncate w-32 md:w-64 font-semibold">${item.file_name}</span>
-                                <span class="text-[10px] text-gray-400 italic">${item.caption || 'No caption'}</span>
-                            </div>
-                        </div>
-                        <button onclick="deleteFile('${item.id}', '${item.file_name}')" class="text-red-500 text-xs font-bold">FUTA</button>
-                    </div>
-                `;
-            });
-        }
-
-        async function deleteFile(id, fileName) {
-            if (!confirm("Unataka kufuta kabisa?")) return;
-            try {
-                await _supabase.storage.from('media').remove([fileName]);
-                await _supabase.from('vault_media').delete().eq('id', id);
-                fetchAdminMedia();
-            } catch (err) {
-                alert("Imefeli kufuta: " + err.message);
-            }
-        }
-
-        // Pakia list mara tu page inapofunguka
-        fetchAdminMedia();
     </script>
 </body>
 </html>
