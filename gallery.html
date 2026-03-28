@@ -13,106 +13,138 @@
         .special-font { font-family: 'Dancing Script', cursive; }
         .luxury-font { font-family: 'Playfair Display', serif; font-style: italic; }
         
+        /* MASONRY LAYOUT */
         .media-container { column-count: 2; column-gap: 16px; padding: 15px; display: none; }
         @media (min-width: 768px) { .media-container { column-count: 4; column-gap: 25px; } }
 
         .media-item {
             break-inside: avoid; margin-bottom: 20px; border-radius: 24px;
             overflow: hidden; border: 1px solid rgba(255, 65, 108, 0.15);
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(5px);
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
-
         .media-item:hover { transform: scale(1.04); border-color: var(--accent); z-index: 10; }
         .media-item img, .media-item video { width: 100%; display: block; }
 
+        /* SEARCH BAR */
         .search-input {
-            width: 100%; max-width: 320px; padding: 12px 25px; border-radius: 50px;
+            width: 100%; max-width: 350px; padding: 14px 25px; border-radius: 50px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 65, 108, 0.3);
-            color: white; font-size: 12px; transition: 0.4s; text-align: center; outline: none;
+            color: white; font-size: 13px; transition: 0.4s; text-align: center; outline: none;
         }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 65, 108, 0.2); }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 65, 108, 0.3); background: rgba(255, 255, 255, 0.07); }
 
-        .heart-loader { color: var(--accent); font-size: 40px; animation: heartBeat 1.2s infinite; text-align: center; }
+        /* LOADER */
+        .heart-loader { color: var(--accent); font-size: 50px; animation: heartBeat 1.2s infinite; text-align: center; }
         @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
         
-        audio { filter: invert(1); width: 90%; height: 30px; margin: 15px auto; display: block; }
+        /* VOICE NOTE STYLE */
+        .audio-card { background: linear-gradient(45deg, rgba(255, 65, 108, 0.1), rgba(0,0,0,0.5)); padding: 20px; border-radius: 20px; text-align: center; }
+        audio { filter: invert(1); width: 100%; height: 35px; margin-top: 10px; opacity: 0.8; }
+
+        /* CAPTION STYLE */
+        .caption { font-size: 10px; color: #ffccd5; text-align: center; padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
-<body class="pb-10">
+<body class="pb-20">
 
-    <nav class="fixed top-4 left-0 w-full z-50 flex justify-center">
-        <div class="bg-black/70 backdrop-blur-xl border border-white/10 px-8 py-3 rounded-full flex gap-8 items-center">
-            <a href="love.html" class="special-font text-2xl text-pink-500">❤️</a>
-            <div class="h-4 w-[1px] bg-white/10"></div>
-            <a href="admin.html" class="text-[10px] font-bold tracking-[0.3em] text-white/50 hover:text-pink-400">ADMIN</a>
+    <nav class="fixed top-5 left-0 w-full z-50 flex justify-center px-4">
+        <div class="bg-black/60 backdrop-blur-2xl border border-white/10 px-8 py-3 rounded-full flex gap-10 items-center shadow-2xl">
+            <a href="love.html" class="special-font text-3xl text-pink-500 hover:scale-110 transition">❤️</a>
+            <div class="h-5 w-[1px] bg-white/20"></div>
+            <a href="admin.html" class="text-[10px] font-bold tracking-[0.4em] text-white/40 hover:text-pink-500 transition">ADMIN</a>
         </div>
     </nav>
 
-    <header class="text-center pt-32 mb-10 px-6">
-        <h1 class="luxury-font text-5xl md:text-7xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-400 to-pink-600">
+    <header class="text-center pt-40 mb-12 px-6">
+        <h1 class="luxury-font text-6xl md:text-8xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-400 to-pink-600">
             Maktaba ya Siri
         </h1>
-        <div class="flex justify-center mt-6">
-            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="TAFUTA KWA HISIA..." class="search-input">
+        <p class="text-[10px] uppercase tracking-[0.7em] text-white/30 font-light mb-10">Vault of Sacred Memories</p>
+        
+        <div class="flex justify-center">
+            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="TAFUTA KWA HISIA AU JINA..." class="search-input">
         </div>
     </header>
 
-    <div id="loader" class="py-20 text-center">
+    <div id="loader" class="py-24 text-center">
         <div class="heart-loader">❤️</div>
-        <p class="text-[10px] tracking-widest text-gray-500 mt-4 uppercase">Inafungua Vault...</p>
+        <p class="text-[11px] tracking-[0.5em] text-pink-300 mt-6 uppercase animate-pulse">Inafungua Vault ya Totoo...</p>
     </div>
 
     <div id="media-grid" class="media-container"></div>
+
+    <footer class="mt-32 text-center">
+        <div class="h-[1px] w-20 bg-pink-600/30 mx-auto mb-6"></div>
+        <p class="text-gray-600 text-[10px] uppercase tracking-[0.4em]">Mali ya Agrey & Totoo | 2024 - 2026</p>
+    </footer>
 
     <script>
         const SUPABASE_URL = 'https://rcfocaatkscgassogibs.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let allMedia = [];
+        let allMediaData = []; // Hapa ndipo tunatunza data yote kutoka Supabase
 
-        async function loadGallery() {
-            // MUHIMU: Inasoma kwenye Table (vault_media) badala ya Storage List
+        // 1. KAZI: Vuta data yote kutoka kwenye Table ya Database
+        async function fetchVaultData() {
             const { data, error } = await supabase
-                .from('vault_media')
+                .from('vault_media') // Table tuliyotengeneza kwenye SQL
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("Error:", error);
+                console.error("Supabase Error:", error.message);
+                document.getElementById('loader').innerHTML = `<p class="text-red-500">Kuna Tatizo: ${error.message}</p>`;
                 return;
             }
 
-            allMedia = data;
-            renderMedia(allMedia);
+            allMediaData = data;
+            renderGallery(allMediaData);
         }
 
-        function renderMedia(items) {
+        // 2. KAZI: Jenga picha/video/sauti kwenye screen
+        function renderGallery(items) {
             const grid = document.getElementById('media-grid');
             const loader = document.getElementById('loader');
             grid.innerHTML = '';
 
+            if (items.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-20 text-center text-gray-500 tracking-widest text-xs uppercase">Vault ipo tupu kwa sasa...</div>';
+            }
+
             items.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'media-item';
+                div.className = 'media-item shadow-2xl';
                 
-                let content = '';
                 const ext = item.file_name.split('.').pop().toLowerCase();
+                let mediaHtml = '';
 
-                if (item.file_type === 'image') {
-                    content = `<img src="${item.file_url}" loading="lazy">`;
-                } else if (item.file_type === 'video') {
-                    content = `<video controls loop muted><source src="${item.file_url}" type="video/${ext}"></video>`;
-                } else if (item.file_type === 'audio') {
-                    content = `
-                        <div class="p-6 text-center">
-                            <p class="text-[9px] mb-3 text-pink-400 font-bold tracking-widest uppercase">Voice Note 🎙️</p>
+                // Angalia kama ni Picha
+                if (item.file_type === 'image' || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                    mediaHtml = `<img src="${item.file_url}" alt="Memory" loading="lazy">`;
+                } 
+                // Angalia kama ni Video
+                else if (item.file_type === 'video' || ['mp4', 'webm', 'mov'].includes(ext)) {
+                    mediaHtml = `<video controls loop muted class="rounded-t-2xl"><source src="${item.file_url}" type="video/${ext}"></video>`;
+                } 
+                // Angalia kama ni Sauti (Voice Note)
+                else if (item.file_type === 'audio' || ['mp3', 'm4a', 'wav'].includes(ext)) {
+                    mediaHtml = `
+                        <div class="audio-card">
+                            <p class="text-[9px] mb-2 text-pink-400 font-bold uppercase tracking-[0.2em]">Voice Memory 🎙️</p>
                             <audio controls><source src="${item.file_url}" type="audio/${ext}"></audio>
                         </div>`;
                 }
 
-                div.innerHTML = content;
+                // Ongeza Caption kama ipo (Au tumia jina la file)
+                const captionText = item.caption || item.file_name.split('_').slice(1).join(' ').split('.')[0];
+                
+                div.innerHTML = `
+                    ${mediaHtml}
+                    <div class="caption">${captionText}</div>
+                `;
                 grid.appendChild(div);
             });
 
@@ -120,13 +152,20 @@
             grid.style.display = 'block';
         }
 
+        // 3. KAZI: Search Filter ya Uhakika (Inatafuta herufi unapoandika)
         function filterMedia() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMedia.filter(m => m.file_name.toLowerCase().includes(val));
-            renderMedia(filtered);
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filteredResults = allMediaData.filter(item => {
+                return item.file_name.toLowerCase().includes(searchText) || 
+                       (item.caption && item.caption.toLowerCase().includes(searchText));
+            });
+
+            renderGallery(filteredResults);
         }
 
-        loadGallery();
+        // Kuanzisha kazi
+        fetchVaultData();
     </script>
 </body>
 </html>
