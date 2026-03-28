@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Totoo's Vault | Master Edition</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #ff416c; --bg: #030303; }
@@ -13,73 +13,39 @@
         .special-font { font-family: 'Dancing Script', cursive; }
         .luxury-font { font-family: 'Playfair Display', serif; font-style: italic; }
         
-        /* MASONRY PRO LAYOUT */
-        .media-container { 
-            column-count: 2; column-gap: 16px; padding: 15px;
-            animation: fadeIn 1s ease-in;
-        }
+        .media-container { column-count: 2; column-gap: 16px; padding: 15px; display: none; }
         @media (min-width: 768px) { .media-container { column-count: 4; column-gap: 25px; } }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .media-item {
             break-inside: avoid; margin-bottom: 20px; border-radius: 24px;
             overflow: hidden; border: 1px solid rgba(255, 65, 108, 0.15);
             background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(5px);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .media-item:hover {
-            transform: scale(1.04) rotate(1deg);
-            border-color: var(--accent);
-            box-shadow: 0 15px 40px rgba(255, 65, 108, 0.2);
-            z-index: 10;
-        }
+        .media-item:hover { transform: scale(1.04); border-color: var(--accent); z-index: 10; }
+        .media-item img, .media-item video { width: 100%; display: block; }
 
-        .media-item img, .media-item video { width: 100%; height: auto; display: block; transition: 0.5s; }
-        .media-item:hover img { filter: brightness(1.1); }
-
-        /* CAPTION YA KISHUA */
-        .caption-box {
-            padding: 15px 10px;
-            background: linear-gradient(to top, rgba(255, 65, 108, 0.1), transparent);
-            font-size: 13px; font-weight: 300; color: #ffccd5;
-            text-align: center; letter-spacing: 0.5px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* FLOATING NAVIGATION */
-        .glass-nav {
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px; margin: 15px auto; width: fit-content;
-        }
-
-        /* SEARCH MASTER */
-        .search-container { position: relative; max-width: 320px; margin: 30px auto; }
         .search-input {
-            width: 100%; padding: 12px 25px; border-radius: 50px;
+            width: 100%; max-width: 320px; padding: 12px 25px; border-radius: 50px;
             background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 65, 108, 0.3);
-            color: white; font-size: 12px; transition: 0.4s; text-align: center;
+            color: white; font-size: 12px; transition: 0.4s; text-align: center; outline: none;
         }
-        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 65, 108, 0.2); outline: none; background: rgba(255, 255, 255, 0.07); }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(255, 65, 108, 0.2); }
 
-        /* LOADER ANIMATION */
-        .heart-loader { color: var(--accent); font-size: 40px; animation: heartBeat 1.2s infinite; }
-        @keyframes heartBeat { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-
-        audio { filter: invert(1) hue-rotate(180deg); width: 90%; height: 35px; margin: 15px auto; display: block; opacity: 0.7; }
-        video::-webkit-media-controls-panel { background-image: linear-gradient(transparent, rgba(0,0,0,0.8)) !important; }
+        .heart-loader { color: var(--accent); font-size: 40px; animation: heartBeat 1.2s infinite; text-align: center; }
+        @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+        
+        audio { filter: invert(1); width: 90%; height: 30px; margin: 15px auto; display: block; }
     </style>
 </head>
 <body class="pb-10">
 
     <nav class="fixed top-4 left-0 w-full z-50 flex justify-center">
-        <div class="glass-nav px-8 py-3 flex gap-8 items-center">
-            <a href="love.html" class="special-font text-2xl text-pink-500 hover:scale-110 transition">❤️</a>
+        <div class="bg-black/70 backdrop-blur-xl border border-white/10 px-8 py-3 rounded-full flex gap-8 items-center">
+            <a href="love.html" class="special-font text-2xl text-pink-500">❤️</a>
             <div class="h-4 w-[1px] bg-white/10"></div>
-            <a href="admin.html" class="text-[10px] font-bold tracking-[0.3em] text-white/50 hover:text-pink-400 transition">ADMIN</a>
+            <a href="admin.html" class="text-[10px] font-bold tracking-[0.3em] text-white/50 hover:text-pink-400">ADMIN</a>
         </div>
     </nav>
 
@@ -87,12 +53,80 @@
         <h1 class="luxury-font text-5xl md:text-7xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-400 to-pink-600">
             Maktaba ya Siri
         </h1>
-        <p class="text-[9px] uppercase tracking-[0.6em] text-white/30 font-light">Elegance meets memories</p>
-        
-        <div class="search-container">
+        <div class="flex justify-center mt-6">
             <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="TAFUTA KWA HISIA..." class="search-input">
         </div>
     </header>
 
-    <div id="gallery-loader" class="flex flex-col items-center py-32">
-        <div class="heart-
+    <div id="loader" class="py-20 text-center">
+        <div class="heart-loader">❤️</div>
+        <p class="text-[10px] tracking-widest text-gray-500 mt-4 uppercase">Inafungua Vault...</p>
+    </div>
+
+    <div id="media-grid" class="media-container"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://rcfocaatkscgassogibs.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allMedia = [];
+
+        async function loadGallery() {
+            // MUHIMU: Inasoma kwenye Table (vault_media) badala ya Storage List
+            const { data, error } = await supabase
+                .from('vault_media')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error:", error);
+                return;
+            }
+
+            allMedia = data;
+            renderMedia(allMedia);
+        }
+
+        function renderMedia(items) {
+            const grid = document.getElementById('media-grid');
+            const loader = document.getElementById('loader');
+            grid.innerHTML = '';
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'media-item';
+                
+                let content = '';
+                const ext = item.file_name.split('.').pop().toLowerCase();
+
+                if (item.file_type === 'image') {
+                    content = `<img src="${item.file_url}" loading="lazy">`;
+                } else if (item.file_type === 'video') {
+                    content = `<video controls loop muted><source src="${item.file_url}" type="video/${ext}"></video>`;
+                } else if (item.file_type === 'audio') {
+                    content = `
+                        <div class="p-6 text-center">
+                            <p class="text-[9px] mb-3 text-pink-400 font-bold tracking-widest uppercase">Voice Note 🎙️</p>
+                            <audio controls><source src="${item.file_url}" type="audio/${ext}"></audio>
+                        </div>`;
+                }
+
+                div.innerHTML = content;
+                grid.appendChild(div);
+            });
+
+            loader.style.display = 'none';
+            grid.style.display = 'block';
+        }
+
+        function filterMedia() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allMedia.filter(m => m.file_name.toLowerCase().includes(val));
+            renderMedia(filtered);
+        }
+
+        loadGallery();
+    </script>
+</body>
+</html>
