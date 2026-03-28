@@ -3,138 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Totoo's Vault | Master Edition</title>
+    <title>Totoo's Vault | Gallery</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #ff416c; --bg: #030303; }
-        body { background: var(--bg); color: #fff; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
-        .special-font { font-family: 'Dancing Script', cursive; }
+        body { background: #030303; color: white; font-family: 'Poppins', sans-serif; }
         .luxury-font { font-family: 'Playfair Display', serif; font-style: italic; }
         
-        .media-container { column-count: 2; column-gap: 16px; padding: 15px; display: none; }
-        @media (min-width: 768px) { .media-container { column-count: 4; column-gap: 25px; } }
-
-        .media-item {
-            break-inside: avoid; margin-bottom: 20px; border-radius: 24px;
-            overflow: hidden; border: 1px solid rgba(255, 65, 108, 0.15);
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Masonry Grid Setup */
+        #media-grid { 
+            column-count: 2; column-gap: 15px; padding: 15px; display: none; 
+            animation: fadeInUp 0.8s ease forwards;
         }
-        .media-item:hover { transform: scale(1.04); border-color: var(--accent); }
-        .media-item img, .media-item video { width: 100%; display: block; }
+        @media (min-width: 768px) { #media-grid { column-count: 4; } }
 
-        .search-input {
-            width: 100%; max-width: 350px; padding: 14px 25px; border-radius: 50px;
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 65, 108, 0.3);
-            color: white; font-size: 13px; text-align: center; outline: none;
+        .media-card {
+            break-inside: avoid; margin-bottom: 20px; border-radius: 15px;
+            overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
         }
+        .media-card img, .media-card video { width: 100%; display: block; }
+        .caption-area { padding: 12px; text-align: center; font-size: 11px; color: #ffccd5; text-transform: uppercase; letter-spacing: 1px; }
 
-        .heart-loader { color: var(--accent); font-size: 50px; animation: heartBeat 1.2s infinite; text-align: center; }
-        @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
-        
-        audio { filter: invert(1); width: 90%; margin: 15px auto; display: block; }
-        .caption { font-size: 10px; color: #ffccd5; text-align: center; padding: 10px; text-transform: uppercase; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .heart-loader { color: #ff416c; font-size: 40px; animation: pulse 1s infinite; text-align: center; margin-top: 100px; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
     </style>
 </head>
 <body class="pb-20">
 
-    <nav class="fixed top-5 left-0 w-full z-50 flex justify-center px-4">
-        <div class="bg-black/60 backdrop-blur-2xl border border-white/10 px-8 py-3 rounded-full flex gap-10 items-center">
-            <a href="love.html" class="special-font text-3xl text-pink-500">❤️</a>
-            <div class="h-5 w-[1px] bg-white/20"></div>
-            <a href="admin.html" class="text-[10px] font-bold tracking-[0.4em] text-white/40 hover:text-pink-500 transition">ADMIN</a>
-        </div>
+    <nav class="p-6 flex justify-between items-center">
+        <h2 class="luxury-font text-xl text-pink-500">Vault</h2>
+        <a href="admin.html" class="text-[10px] border border-white/20 px-4 py-2 rounded-full hover:bg-white hover:text-black transition">ADMIN</a>
     </nav>
 
-    <header class="text-center pt-40 mb-12 px-6">
-        <h1 class="luxury-font text-6xl md:text-8xl mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-400 to-pink-600">
+    <header class="text-center mt-10 mb-10">
+        <h1 class="luxury-font text-5xl bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500">
             Maktaba ya Siri
         </h1>
-        <div class="flex justify-center mt-10">
-            <input type="text" id="searchInput" onkeyup="filterMedia()" placeholder="TAFUTA KWA HERUFI..." class="search-input">
-        </div>
+        <p class="text-[9px] tracking-[5px] text-white/30 uppercase mt-4">Kila picha ina hadithi</p>
     </header>
 
-    <div id="loader" class="py-24 text-center">
+    <div id="loader">
         <div class="heart-loader">❤️</div>
-        <p id="loader-text" class="text-[11px] tracking-[0.5em] text-pink-300 mt-6 uppercase">Inafungua Vault ya Totoo...</p>
+        <p class="text-center text-[10px] text-pink-300 mt-4 tracking-widest">INAFUNGUA MAKABIDHI...</p>
     </div>
 
-    <div id="media-grid" class="media-container"></div>
+    <div id="media-grid"></div>
 
     <script>
+        // DATA ZAKO ZA SUPABASE
         const SUPABASE_URL = 'https://rcfocaatkscgassogibs.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZm9jYWF0a3NjZ2Fzc29naWJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NjgzNDYsImV4cCI6MjA4ODM0NDM0Nn0.XgyTtSXBRQbbiQLuo4SThVVM6dM5uvUQUl-u_J889U4';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let allData = [];
-
-        async function initGallery() {
-            // VUTA DATA KUTOKA KWENYE TABLE
+        async function fetchVault() {
             const { data, error } = await supabase
                 .from('vault_media')
                 .select('*')
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error("Error:", error);
-                document.getElementById('loader-text').innerText = "Shida: " + error.message;
+                console.error("Shida ya Table:", error.message);
+                document.getElementById('loader').innerHTML = `<p class="text-red-500 text-center">Kosa: ${error.message}</p>`;
                 return;
             }
 
-            allData = data;
-            renderItems(allData);
+            renderVault(data);
         }
 
-        function renderItems(items) {
+        function renderVault(files) {
             const grid = document.getElementById('media-grid');
             const loader = document.getElementById('loader');
             grid.innerHTML = '';
 
-            if (!items || items.length === 0) {
-                document.getElementById('loader-text').innerText = "Vault ipo tupu bado...";
+            if (!files || files.length === 0) {
+                loader.innerHTML = `<p class="text-gray-500 text-center uppercase tracking-widest text-xs mt-20">Vault ipo tupu bado...</p>`;
                 return;
             }
 
-            items.forEach(item => {
-                // HAPA NDIPO TUNAHAKIKISHA TUNASOMA DATA HATA KAMA MAJINA YA COLUMN YALIKOSEWA
-                const url = item.file_url || item.url || item.File_Url;
-                const name = item.file_name || item.name || item.File_Name;
-                const type = item.file_type || item.type || "image";
+            files.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'media-card';
 
-                const div = document.createElement('div');
-                div.className = 'media-item shadow-2xl';
-                
-                let html = '';
-                const ext = name.split('.').pop().toLowerCase();
+                // Kutambua kama ni picha au video
+                let mediaTag = '';
+                const ext = file.file_name.split('.').pop().toLowerCase();
 
-                if (type.includes('image') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
-                    html = `<img src="${url}" loading="lazy">`;
-                } else if (type.includes('video') || ['mp4', 'webm', 'mov'].includes(ext)) {
-                    html = `<video controls loop muted><source src="${url}" type="video/${ext}"></video>`;
-                } else if (type.includes('audio') || ['mp3', 'm4a', 'wav'].includes(ext)) {
-                    html = `<div class="p-4 text-center bg-pink-500/5"><p class="text-[9px] text-pink-400 font-bold uppercase">VOICE NOTE 🎙️</p><audio controls><source src="${url}" type="audio/${ext}"></audio></div>`;
+                if (file.file_type === 'image' || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) {
+                    mediaTag = `<img src="${file.file_url}" alt="Memory" loading="lazy">`;
+                } else if (file.file_type === 'video' || ['mp4', 'mov', 'webm'].includes(ext)) {
+                    mediaTag = `<video controls muted loop><source src="${file.file_url}" type="video/${ext}"></video>`;
+                } else if (file.file_type === 'audio' || ['mp3', 'm4a', 'wav'].includes(ext)) {
+                    mediaTag = `<div class="p-4 bg-pink-500/10 text-center"><p class="text-[8px] mb-2">VOICE NOTE</p><audio controls class="w-full h-8"><source src="${file.file_url}" type="audio/${ext}"></audio></div>`;
                 }
 
-                if (html) {
-                    div.innerHTML = `${html}<div class="caption">${name.substring(0, 20)}...</div>`;
-                    grid.appendChild(div);
-                }
+                card.innerHTML = `
+                    ${mediaTag}
+                    <div class="caption-area">${file.caption || 'Memory'}</div>
+                `;
+                grid.appendChild(card);
             });
 
             loader.style.display = 'none';
             grid.style.display = 'block';
         }
 
-        function filterMedia() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allData.filter(i => (i.file_name || i.name || "").toLowerCase().includes(val));
-            renderItems(filtered);
-        }
-
-        initGallery();
+        // Kuanzisha kazi mara tu page inapofunguka
+        fetchVault();
     </script>
 </body>
 </html>
